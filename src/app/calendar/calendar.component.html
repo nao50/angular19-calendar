@@ -1,0 +1,31 @@
+<div class="h-screen grid grid-rows-[auto_1fr] gap-4 p-4">
+  <app-calendar-header
+    [currentDate]="currentDate"
+    [viewMode]="currentViewMode"
+    (viewModeChange)="changeViewMode($event)"
+    (previous)="navigatePrevious()"
+    (next)="navigateNext()"
+    (today)="goToToday()"
+  />
+
+  <div class="overflow-auto">
+    @switch (currentViewMode) { @case ('Month') {
+    <app-month-calendar
+      [currentDate]="currentDate"
+      [daysDisplayedWithinMonth]="calendarDays"
+      [schedules]="schedules()"
+      (createSchedule)="openModal($event)"
+    />
+    } }
+  </div>
+
+  @if (showModal) {
+  <app-event-modal
+    [selectedDate]="selectedDate!"
+    [editingSchedule]="editingSchedule"
+    (closeModal)="closeModal()"
+    (saveSchedule)="saveSchedule($event)"
+    (deleteSchedule)="deleteSchedule($event)"
+  />
+  }
+</div>

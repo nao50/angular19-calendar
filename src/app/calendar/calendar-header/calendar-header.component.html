@@ -1,0 +1,39 @@
+<div class="grid grid-cols-[1fr_auto_auto] gap-4 items-center pb-4 mb-4">
+  <h1 class="text-xl font-semibold text-gray-900">
+    {{ formatDate(currentDate(), viewTitleFormat) }}
+  </h1>
+
+  <div class="grid grid-flow-col gap-1 bg-gray-100 p-1 rounded-lg">
+    @for (v of views; track v) {
+    <button
+      (click)="viewModeChange.emit(v)"
+      [class.bg-white]="viewMode() === v"
+      [class.shadow]="viewMode() === v"
+      class="px-3 py-1.5 text-sm font-medium rounded-md"
+    >
+      {{ v }}
+    </button>
+    }
+  </div>
+
+  <div class="grid grid-flow-col gap-1">
+    <button
+      (click)="previous.emit()"
+      class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
+    >
+      ◀
+    </button>
+    <button
+      (click)="today.emit()"
+      class="px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+    >
+      今日
+    </button>
+    <button
+      (click)="next.emit()"
+      class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
+    >
+      ▶
+    </button>
+  </div>
+</div>
