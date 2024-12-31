@@ -1,16 +1,16 @@
 <div
-  class="group relative bg-blue-50 border-l-4 border-blue-500 px-2 py-1 rounded-r text-sm hover:bg-blue-100"
+  class="group relative bg-blue-50 border-l-4 border-blue-500 px-2 py-1 rounded-r text-sm hover:bg-blue-100 h-full"
   (click)="editSchedule.emit(schedule())"
 >
   <div class="grid gap-0.5">
     <div class="grid grid-cols-[auto_1fr] gap-1 items-center">
-      <span class="text-xs text-gray-600">
+      <span class="text-xs text-gray-600 whitespace-nowrap">
         {{ formatDate(schedule().startDate, "HH:mm") }}
       </span>
       <span class="truncate font-medium">{{ schedule().title }}</span>
     </div>
     @if (isMultiDay) {
-    <span class="text-xs text-gray-500">
+    <span class="text-xs text-gray-500 truncate">
       {{ formatDate(schedule().endDate, "M/d HH:mm") }}まで
     </span>
     }

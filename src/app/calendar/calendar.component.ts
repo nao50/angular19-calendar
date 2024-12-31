@@ -100,7 +100,6 @@ export class CalendarComponent {
   }
 
   saveSchedule(schedule: Omit<Schedule, 'id'>) {
-    // console.log('schedule', schedule);
     if (this.editingSchedule) {
       this.scheduleService.updateSchedule({
         ...this.editingSchedule,
@@ -126,7 +125,6 @@ export class CalendarComponent {
 
     return this.scheduleService.getSchedulesForDate(date)
       .filter(schedule => {
-        console.log('schedule', schedule)
         const start = new Date(schedule.startDate);
         return start >= startTime && start < endTime;
       });
