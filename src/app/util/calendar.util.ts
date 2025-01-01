@@ -7,7 +7,16 @@ import {
   isSameDay,
   isWithinInterval,
   differenceInDays,
+  eachDayOfInterval,
+  differenceInMinutes,
 } from 'date-fns';
+
+export const getWeekDays = (date: Date): Date[] => {
+  return eachDayOfInterval({
+    start: startOfWeek(date, { weekStartsOn: 0 }),
+    end: endOfWeek(date, { weekStartsOn: 0 })
+  });
+}
 
 export const getCalendarWeeksCount = (date: Date): number => {
   const start = startOfWeek(startOfMonth(date), { weekStartsOn: 0 });
@@ -112,4 +121,24 @@ export const getEventsForDay = (date: Date, events: Schedule[]): Schedule[] => {
            isSameDay(date, start) || 
            isSameDay(date, end);
   });
+}
+
+export const calculateSchedulePositionsForWeeklyCalender
+  = (event: Schedule, hourHeight: number = 56): { 
+    top: string;
+    height: string;
+  } => {
+  const start = new Date(event.startDate);
+  const end = new Date(event.endDate);
+  
+  const minutesFromStartOfDay = start.getHours() * 60 + start.getMinutes();
+  const duration = differenceInMinutes(end, start);
+  
+  const top = (minutesFromStartOfDay / 60) * hourHeight;
+  const height = (duration / 60) * hourHeight;
+  
+  return {
+    top: `${top}px`,
+    height: `${height}px`
+  };
 }

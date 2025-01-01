@@ -1,3 +1,4 @@
+<!-- <div class="h-screen grid grid-rows-[auto_1fr] gap-4 p-4"> -->
 <div class="h-screen grid grid-rows-[auto_1fr] gap-4 p-4">
   <app-calendar-header
     [currentDate]="currentDate"
@@ -15,6 +16,14 @@
       [daysDisplayedWithinMonth]="calendarDays"
       [schedules]="schedules()"
       (createSchedule)="openModal($event)"
+      (editSchedule)="editSchedule($event)"
+    />
+    } @case ('Week') {
+    <app-week-calendar
+      [daysDisplayedWithinMonth]="calendarDays"
+      [schedules]="schedules()"
+      (createSchedule)="openModal($event)"
+      (editSchedule)="editSchedule($event)"
     />
     } }
   </div>

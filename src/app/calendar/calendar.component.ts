@@ -1,11 +1,13 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, output } from '@angular/core';
 import { CalendarHeaderComponent } from './calendar-header/calendar-header.component';
 import { MonthCalendarComponent } from './month-calendar/month-calendar.component';
+import { WeekCalendarComponent } from './week-calendar/week-calendar.component';
 import { EventModalComponent } from './event-modal/event-modal.component';
 import { ScheduleService } from '../service/schedule.service';
 import { CalendarViewMode } from '../model/calendar.model';
 import { Schedule } from '../model/schedule.model';
 import { generateCalendarDays } from '../util/date.util';
+import { getWeekDays } from '../util/calendar.util';
 
 import { 
   addDays,
@@ -15,7 +17,7 @@ import {
 
 @Component({
   selector: 'app-calendar',
-  imports: [CalendarHeaderComponent, MonthCalendarComponent, EventModalComponent],
+  imports: [CalendarHeaderComponent, MonthCalendarComponent, WeekCalendarComponent, EventModalComponent],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })
@@ -28,6 +30,7 @@ export class CalendarComponent {
   showModal = false;
   selectedDate: Date | null = null;
   editingSchedule: Schedule | undefined = undefined;
+  // editSchedule = output<Schedule>();
 
   ngOnInit() {
     this.generateDays();
@@ -43,9 +46,9 @@ export class CalendarComponent {
       case 'Month':
         this.calendarDays = generateCalendarDays(this.currentDate);
         break;
-      // case 'Week':
-      //   this.calendarDays = getWeekDays(this.currentDate);
-      //   break;
+      case 'Week':
+        this.calendarDays = getWeekDays(this.currentDate);
+        break;
       // case 'Day':
       //   this.calendarDays = [this.currentDate];
       //   break;
@@ -109,6 +112,13 @@ export class CalendarComponent {
       this.scheduleService.addSchedule(schedule);
     }
     this.closeModal();
+  }
+
+  editSchedule(schedule: Schedule) {
+    // console.log('schedule', schedule)
+    this.selectedDate = new Date(schedule.startDate);
+    this.editingSchedule = schedule;
+    this.showModal = true;
   }
 
   deleteSchedule(schedule: Schedule) {

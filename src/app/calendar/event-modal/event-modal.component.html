@@ -1,5 +1,5 @@
 <div
-  class="fixed inset-0 bg-black bg-opacity-50 grid place-items-center"
+  class="fixed inset-0 bg-black bg-opacity-50 grid place-items-center z-20"
   (click)="onBackdropClick($event)"
 >
   <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md grid gap-4">
@@ -26,6 +26,7 @@
           name="title"
           class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           required
+          autofocus
         />
       </div>
       <div class="grid grid-cols-2 gap-4">

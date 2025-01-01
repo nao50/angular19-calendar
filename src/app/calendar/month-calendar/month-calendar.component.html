@@ -29,7 +29,7 @@
             schedule.schedule.id) {
             <app-schedule
               [schedule]="schedule.schedule"
-              (editSchedule)="editSchedule.emit($event)"
+              (editSchedule)="editSchedule.emit(schedule.schedule)"
               class="block min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]"
             />
             } @if (hasHiddenSchedules(day)) {
@@ -44,6 +44,7 @@
     }
   </div>
 </div>
+
 <!-- <div class="h-full grid grid-rows-[auto_1fr]">
   <div class="grid grid-cols-7">
     @for (dayOfWeek of dayOfWeeks; track dayOfWeek) {

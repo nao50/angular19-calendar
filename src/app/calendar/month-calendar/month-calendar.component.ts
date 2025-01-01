@@ -15,9 +15,10 @@ export class MonthCalendarComponent implements AfterViewInit {
   dayOfWeeks = ['日', '月', '火', '水', '木', '金', '土'];
   currentDate = input.required<Date>();
   daysDisplayedWithinMonth = input<Date[]>([]);
-  editSchedule = output<Schedule>();
   schedules = input<Schedule[]>();
   createSchedule = output<Date>();
+  editSchedule = output<Schedule>();
+
   //
   @ViewChild('calendarGrid') calendarGrid!: ElementRef;
   private cellHeight = signal(0);
@@ -35,15 +36,11 @@ export class MonthCalendarComponent implements AfterViewInit {
       const scheduleHeight = 40; // スケジュール1件の高さ
       const moreTextHeight = 20; // 「他 X 件...」の高さ
       const scheduleGap = 0; // スケジュール間のギャップ
-      
-      console.log('height::', height);
 
       const availableHeight = height - dateHeight - moreTextHeight;
       const scheduleWithGapHeight = scheduleHeight + scheduleGap;
       
       this.maxVisibleSchedules.set(Math.max(1, Math.floor(availableHeight / scheduleWithGapHeight)));
-
-      console.log('this.maxVisibleSchedules', this.maxVisibleSchedules());
     });
   }
 

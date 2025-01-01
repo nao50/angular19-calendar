@@ -17,4 +17,9 @@ export class ScheduleComponent {
   get isMultiDay(): boolean {
     return !isSameDay(this.schedule().startDate, this.schedule().endDate);
   }
+
+  handleClick(event: Event): void {
+    event.stopPropagation()
+    this.editSchedule.emit(this.schedule());
+  }
 }
