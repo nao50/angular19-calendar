@@ -21,62 +21,86 @@
       <div class="text-sm font-medium">{{ formatDate(day, "d") }}</div>
 
       <div class="relative min-h-0">
-        <div class="absolute inset-0 overflow-hidden">
-          <!-- <div class="space-y-1 max-h-[80px]"> -->
-          <!-- <div class="space-y-[0.5px]"> -->
-          <div class="">
-            @for (schedule of getVisibleSchedules(day); track
-            schedule.schedule.id) {
-            <app-schedule
-              [schedule]="schedule.schedule"
-              (editSchedule)="editSchedule.emit(schedule.schedule)"
-              class="block min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]"
-            />
-            } @if (hasHiddenSchedules(day)) {
-            <div class="text-xs text-gray-500 px-2 py-0.5">
-              他 {{ getHiddenSchedulesCount(day) }} 件...
-            </div>
-            }
+        <!-- <div class="absolute inset-0 overflow-hidden"> -->
+        <div class="absolute inset-0">
+          @for (schedule of getVisibleSchedules(day); track
+          schedule.schedule.id) {
+          <!-- <app-schedule
+            [schedule]="schedule"
+            (editSchedule)="editSchedule.emit(schedule)"
+            [ngStyle]="{
+              'width': getGridScheduleClass(schedule, day),
+            }"
+            [class]="gridScheduleClass(schedule, day)"
+          /> -->
+          <app-schedule
+            [schedule]="schedule.schedule"
+            [ngStyle]="getScheduleStyle(schedule)"
+            (editSchedule)="editSchedule.emit(schedule.schedule)"
+            class="block min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]"
+          />
+
+          <!-- <app-schedule
+            [schedule]="schedule.schedule"
+            (editSchedule)="editSchedule.emit(schedule.schedule)"
+            class="absolute block w-[calc(300%_+_1rem)] top-[2em] min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]"
+          /> -->
+          <!-- <app-schedule
+            [schedule]="schedule.schedule"
+            (editSchedule)="editSchedule.emit(schedule.schedule)"
+            class="col-span-2 min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]"
+          /> -->
+          } @if (hasHiddenSchedules(day)) {
+          <div class="text-xs text-gray-500 px-2 py-0.5">
+            他 {{ getHiddenSchedulesCount(day) }} 件...
           </div>
+          }
         </div>
       </div>
     </div>
     }
-  </div>
-</div>
-
-<!-- <div class="h-full grid grid-rows-[auto_1fr]">
-  <div class="grid grid-cols-7">
-    @for (dayOfWeek of dayOfWeeks; track dayOfWeek) {
-    <div
-      class="text-sm font-medium border-[0.5px] text-gray-500 p-2 text-center bg-gray-50"
-    >
-      {{ dayOfWeek }}
-    </div>
-    }
+    <!--  -->
+    <!-- <div
+      class="absolute col-span-2 px-0.5 py-0.5 bg-blue-50 border-l-4 border-blue-500 rounded-r text-sm"
+      [style.grid-row]="1 + '/ span' + 2"
+      [style.grid-column]="1 + ' / span ' + 2"
+      [style.top]="500 + 'px'"
+    > -->
   </div>
 
-  <div [class]="gridRowsClass">
+  <!-- <div [class]="gridRowsClass" #calendarGrid>
     @for (day of daysDisplayedWithinMonth(); track day) {
     <div
       [class.bg-gray-50]="!isSameMonth(day, currentDate())"
       [class.text-gray-400]="!isSameMonth(day, currentDate())"
       [class.bg-blue-50]="isToday(day)"
-      class="border p-1 h-full grid grid-rows-[auto_1fr] cursor-pointer"
+      class="border p-1 h-full grid grid-rows-[auto_1fr] cursor-pointer relative"
       (click)="createSchedule.emit(day)"
     >
       <div class="text-sm font-medium">{{ formatDate(day, "d") }}</div>
 
-      <div class="min-h-0 overflow-y-auto">
-        @for (schedule of getPositionsForDay(day); track schedule.schedule.id) {
-        <app-schedule
-          class=""
-          [schedule]="schedule.schedule"
-          (editSchedule)="editSchedule.emit($event)"
-        />
-        }
+      @if (hasHiddenSchedules(day)) {
+      <div
+        class="absolute bottom-0 left-0 right-0 text-xs text-gray-500 px-2 py-0.5 bg-white/80"
+      >
+        他 {{ getHiddenSchedulesCount(day) }} 件...
       </div>
+      }
     </div>
-    }
-  </div>
-</div> -->
+    } @for (week of getWeeks(); track week) { @for (position of
+    getVisibleSchedulePositionsForWeek(week); track position.schedule.id) {
+    <div
+      class="absolute px-0.5 py-0.5"
+      [style.grid-row]="getScheduleGridRow(week, position)"
+      [style.grid-column]="getScheduleGridColumn(position)"
+      [style.top]="getScheduleTop(position)"
+    >
+      <app-schedule
+        [schedule]="position.schedule"
+        (editSchedule)="editSchedule.emit(position.schedule)"
+        class="block w-full"
+      />
+    </div>
+    } }
+  </div> -->
+</div>
