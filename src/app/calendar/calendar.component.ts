@@ -30,7 +30,6 @@ export class CalendarComponent {
   showModal = false;
   selectedDate: Date | null = null;
   editingSchedule: Schedule | undefined = undefined;
-  // editSchedule = output<Schedule>();
 
   ngOnInit() {
     this.generateDays();
@@ -115,7 +114,6 @@ export class CalendarComponent {
   }
 
   editSchedule(schedule: Schedule) {
-    // console.log('schedule', schedule)
     this.selectedDate = new Date(schedule.startDate);
     this.editingSchedule = schedule;
     this.showModal = true;
