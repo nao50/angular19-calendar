@@ -1,4 +1,5 @@
 import { Component, input, output } from '@angular/core';
+import { AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Schedule } from '../../model/schedule.model';
@@ -10,7 +11,8 @@ import { formatDate } from '../../util/date.util';
   templateUrl: './event-modal.component.html',
   styleUrl: './event-modal.component.css'
 })
-export class EventModalComponent {
+export class EventModalComponent implements AfterViewInit {
+  @ViewChild('titleField') titleField: ElementRef<HTMLInputElement> | undefined;
   selectedDate = input.required<Date>();
   editingSchedule = input<Schedule>();
   closeModal = output<void>();
@@ -22,6 +24,10 @@ export class EventModalComponent {
   startDate = '';
   endDate = '';
   formatDate = formatDate;
+
+  ngAfterViewInit() {
+    this.titleField!.nativeElement.focus();
+  }
 
   private formatDateTimeLocal(date: Date): string {
     const year = date.getFullYear();

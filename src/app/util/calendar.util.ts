@@ -1,4 +1,4 @@
-import { Schedule, MonthlyCalendarSchedulePosition, MonthlyCalendarSchedulePosition2 } from '../model/schedule.model'; 
+import { Schedule, MonthlyCalendarSchedulePosition } from '../model/schedule.model'; 
 import {
   startOfWeek,
   endOfWeek,
@@ -26,31 +26,32 @@ export const getCalendarWeeksCount = (date: Date): number => {
   return Math.ceil((end.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000)) + 1;
 }
 
-export const calculateSchedulePositions = (
-  schedules: Schedule[],
-  currentDate: Date,
-): MonthlyCalendarSchedulePosition[] => {
-  return schedules
-    .filter(schedule => {
-      const start = new Date(schedule.startDate);
-      const end = new Date(schedule.endDate);
-      return isWithinInterval(currentDate, { start, end }) || 
-             isSameDay(currentDate, start) || 
-             isSameDay(currentDate, end);
-    })
-    .map(schedule => ({
-      schedule,
-      column: 0,
-      columnSpan: 1,
-      row: 0,
-      rowSpan: 1
-    }));
-}
+// export const calculateSchedulePositions = (
+//   schedules: Schedule[],
+//   currentDate: Date,
+// ): MonthlyCalendarSchedulePosition[] => {
+//   return schedules
+//     .filter(schedule => {
+//       const start = new Date(schedule.startDate);
+//       const end = new Date(schedule.endDate);
+//       return isWithinInterval(currentDate, { start, end }) || 
+//              isSameDay(currentDate, start) || 
+//              isSameDay(currentDate, end);
+//     })
+//     .map(schedule => ({
+//       schedule,
+//       column: 0,
+//       columnSpan: 1,
+//       row: 0,
+//       rowSpan: 1
+//     }));
+// }
 
 export const calculateSchedulePositionsForMonthlyCalender = (
   schedules: Schedule[],
   weekStart: Date,
-): MonthlyCalendarSchedulePosition2[] => {
+  maxVisibleSchedules: number
+): MonthlyCalendarSchedulePosition[] => {
   const weekEnd = endOfWeek(weekStart, { weekStartsOn: 0 });
   // この週に表示すべきスケジュールをフィルタリング
   const weeklySchedules = schedules.filter(schedule => {
@@ -61,29 +62,7 @@ export const calculateSchedulePositionsForMonthlyCalender = (
            isWithinInterval(start, { start: weekStart, end: weekEnd });
   });
 
-  // // 各スケジュールの週内での位置を計算
-  // const positions: MonthlyCalendarSchedulePosition2[] = weeklySchedules.map(schedule => {
-  //   const start = new Date(schedule.startDate);
-  //   const end = new Date(schedule.endDate);
-    
-  //   // 週の開始位置を計算（週の始めより前なら0）
-  //   const startOffset = start < weekStart 
-  //     ? 0 
-  //     : differenceInDays(start, weekStart);
-    
-  //   // 週内での表示日数を計算
-  //   const duration = end > weekEnd
-  //     ? 7 - startOffset  // 週末まで
-  //     : differenceInDays(end, start) + 1;
-
-  //   return {
-  //     schedule,
-  //     startOffset,
-  //     duration,
-  //     row: 0  // 後で重なり計算で更新
-  //   };
-  // });
-  const positions: MonthlyCalendarSchedulePosition2[] = weeklySchedules.map(schedule => {
+  const positions: MonthlyCalendarSchedulePosition[] = weeklySchedules.map(schedule => {
     const start = new Date(schedule.startDate);
     const end = new Date(schedule.endDate);
     
@@ -99,15 +78,20 @@ export const calculateSchedulePositionsForMonthlyCalender = (
       schedule,
       startOffset,
       duration,
-      row: 0
+      row: 0,
+      isHiddenByDisplaySize: false,
     };
   });
 
   // 重なりを解決して行位置を割り当て
-  return assignRows(positions);
+  // return assignRows(positions);
+  return assignRows(positions).map(pos => ({
+    ...pos,
+    isHiddenByDisplaySize: pos.row >= maxVisibleSchedules
+  }));
 }
 
-function assignRows(positions: MonthlyCalendarSchedulePosition2[]): MonthlyCalendarSchedulePosition2[] {
+function assignRows(positions: MonthlyCalendarSchedulePosition[]): MonthlyCalendarSchedulePosition[] {
   // 開始日が早い順、長い順にソート
   positions.sort((a, b) => {
     if (a.startOffset !== b.startOffset) {
@@ -138,6 +122,7 @@ function assignRows(positions: MonthlyCalendarSchedulePosition2[]): MonthlyCalen
     }
   });
 }
+
 // export const calculateSchedulePositions = (
 //   schedules: Schedule[],
 //   currentDate: Date,
@@ -188,87 +173,6 @@ function assignRows(positions: MonthlyCalendarSchedulePosition2[]): MonthlyCalen
 //     }
 //     // 開始時刻が早いものを優先
 //     return a.schedule.startDate.getTime() - b.schedule.startDate.getTime();
-//   });
-
-//   // 各行の使用状況を追跡
-//   const rowUsage: boolean[][] = Array(10).fill(null).map(() => Array(7).fill(false));
-
-//   positions.forEach(pos => {
-//     let row = 0;
-//     // スケジュールを配置できる最初の行を探す
-//     while (true) {
-//       let canPlaceAtRow = true;
-//       for (let col = pos.column; col < pos.column + pos.columnSpan; col++) {
-//         if (rowUsage[row][col]) {
-//           canPlaceAtRow = false;
-//           break;
-//         }
-//       }
-//       if (canPlaceAtRow) {
-//         // この行にスケジュールを配置
-//         for (let col = pos.column; col < pos.column + pos.columnSpan; col++) {
-//           rowUsage[row][col] = true;
-//         }
-//         pos.row = row;
-//         break;
-//       }
-//       row++;
-//     }
-//   });
-
-//   return positions;
-// }
-
-// export const calculateSchedulePositions = (
-//   schedules: Schedule[],
-//   weekStart: Date,
-// ): MonthlyCalendarSchedulePosition[] => {
-//   const weekEnd = endOfWeek(weekStart, { weekStartsOn: 0 });
-  
-//   const relevantSchedules = schedules.filter(schedule => {
-//     const start = startOfDay(new Date(schedule.startDate));
-//     const end = endOfDay(new Date(schedule.endDate));
-//     return isWithinInterval(weekStart, { start, end }) ||
-//            isWithinInterval(weekEnd, { start, end }) ||
-//            isWithinInterval(start, { start: weekStart, end: weekEnd });
-//   });
-
-//   // 同じ週内でのスケジュールの開始日と終了日を計算
-//   const positions = relevantSchedules.map(schedule => {
-//     const start = new Date(schedule.startDate);
-//     const end = new Date(schedule.endDate);
-    
-//     // 週の開始日と終了日に制限
-//     const effectiveStart = start < weekStart ? weekStart : start;
-//     const effectiveEnd = end > weekEnd ? weekEnd : end;
-    
-//     // 列の位置とスパンを計算
-//     const column = effectiveStart.getDay();
-//     const columnSpan = Math.min(
-//       7 - column, // 週末までの残り日数
-//       differenceInDays(effectiveEnd, effectiveStart) + 1 // 実際の日数
-//     );
-
-//     return {
-//       schedule,
-//       column,
-//       columnSpan,
-//       row: 0,
-//       rowSpan: 1
-//     };
-//   });
-
-//   // 行の位置を割り当て（重なりを避けるため）
-//   positions.sort((a, b) => {
-//     // 長いスケジュールを優先
-//     if (a.columnSpan !== b.columnSpan) {
-//       return b.columnSpan - a.columnSpan;
-//     }
-//     // 開始時刻が早いものを優先
-//     return differenceInMinutes(
-//       a.schedule.startDate,
-//       b.schedule.startDate
-//     );
 //   });
 
 //   // 各行の使用状況を追跡

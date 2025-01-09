@@ -24,16 +24,14 @@
       (createSchedule)="openModal($event)"
       (editSchedule)="editSchedule($event)"
     />
-    } }
+    } } @if (showModal) {
+    <app-event-modal
+      [selectedDate]="selectedDate!"
+      [editingSchedule]="editingSchedule"
+      (closeModal)="closeModal()"
+      (saveSchedule)="saveSchedule($event)"
+      (deleteSchedule)="deleteSchedule($event)"
+    />
+    }
   </div>
-
-  @if (showModal) {
-  <app-event-modal
-    [selectedDate]="selectedDate!"
-    [editingSchedule]="editingSchedule"
-    (closeModal)="closeModal()"
-    (saveSchedule)="saveSchedule($event)"
-    (deleteSchedule)="deleteSchedule($event)"
-  />
-  }
 </div>

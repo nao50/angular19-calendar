@@ -21,37 +21,20 @@
       <div class="text-sm font-medium">{{ formatDate(day, "d") }}</div>
 
       <div class="relative min-h-0">
-        <!-- <div class="absolute inset-0 overflow-hidden"> -->
         <div class="absolute inset-0">
           @for (schedule of getVisibleSchedules(day); track
           schedule.schedule.id) {
-          <!-- <app-schedule
-            [schedule]="schedule"
-            (editSchedule)="editSchedule.emit(schedule)"
-            [ngStyle]="{
-              'width': getGridScheduleClass(schedule, day),
-            }"
-            [class]="gridScheduleClass(schedule, day)"
-          /> -->
           <app-schedule
             [schedule]="schedule.schedule"
             [ngStyle]="getScheduleStyle(schedule)"
             (editSchedule)="editSchedule.emit(schedule.schedule)"
             class="block min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]"
+            [class.opacity-75]="getHiddenSchedulesCount(day) > 0"
           />
-
-          <!-- <app-schedule
-            [schedule]="schedule.schedule"
-            (editSchedule)="editSchedule.emit(schedule.schedule)"
-            class="absolute block w-[calc(300%_+_1rem)] top-[2em] min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]"
-          /> -->
-          <!-- <app-schedule
-            [schedule]="schedule.schedule"
-            (editSchedule)="editSchedule.emit(schedule.schedule)"
-            class="col-span-2 min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]"
-          /> -->
-          } @if (hasHiddenSchedules(day)) {
-          <div class="text-xs text-gray-500 px-2 py-0.5">
+          } @if (getHiddenSchedulesCount(day) > 0) {
+          <div
+            class="absolute bottom-0 left-0 right-0 bg-white/80 text-sm text-gray-500 px-2 py-0.5 z-10"
+          >
             他 {{ getHiddenSchedulesCount(day) }} 件...
           </div>
           }
@@ -59,13 +42,6 @@
       </div>
     </div>
     }
-    <!--  -->
-    <!-- <div
-      class="absolute col-span-2 px-0.5 py-0.5 bg-blue-50 border-l-4 border-blue-500 rounded-r text-sm"
-      [style.grid-row]="1 + '/ span' + 2"
-      [style.grid-column]="1 + ' / span ' + 2"
-      [style.top]="500 + 'px'"
-    > -->
   </div>
 
   <!-- <div [class]="gridRowsClass" #calendarGrid>

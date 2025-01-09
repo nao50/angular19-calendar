@@ -1,9 +1,9 @@
 import { Component, ViewChild, ElementRef, AfterViewInit, input, output, signal, effect } from '@angular/core';
 import { ScheduleComponent } from '../schedule/schedule.component';
-import { getCalendarWeeksCount, calculateSchedulePositions, calculateSchedulePositionsForMonthlyCalender } from '../../util/calendar.util';
+import { getCalendarWeeksCount, calculateSchedulePositionsForMonthlyCalender } from '../../util/calendar.util';
 import { formatDate } from '../../util/date.util';
-import { Schedule, MonthlyCalendarSchedulePosition, MonthlyCalendarSchedulePosition2 } from '../../model/schedule.model';
-import { addDays, differenceInDays, endOfWeek, isSameDay, isSameMonth, isToday, startOfDay, startOfWeek } from 'date-fns';
+import { Schedule, MonthlyCalendarSchedulePosition } from '../../model/schedule.model';
+import { addDays, differenceInDays, endOfWeek, isSameDay, isSameMonth, isToday, isWithinInterval, startOfDay, startOfWeek } from 'date-fns';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -20,7 +20,6 @@ export class MonthCalendarComponent implements AfterViewInit {
   createSchedule = output<Date>();
   editSchedule = output<Schedule>();
 
-  //
   @ViewChild('calendarGrid') calendarGrid!: ElementRef;
   private cellHeight = signal(0);
   private maxVisibleSchedules = signal(0);
@@ -95,38 +94,38 @@ export class MonthCalendarComponent implements AfterViewInit {
     return `calc(${(daysUntilWeekEnd + 1) * 100}% + ${daysUntilWeekEnd}rem)`
 }
 
-  gridScheduleClass(schedule: Schedule, day: Date): string {
-    const startDate = new Date(schedule.startDate);
-    const endDate = new Date(schedule.endDate);
-    const dayOfWeek = day.getDay();
-    const daysUntilWeekEnd = 6 - dayOfWeek;
-    const weekIndex = Math.floor(this.daysDisplayedWithinMonth().findIndex(d => d === day) / 7);
+  // gridScheduleClass(schedule: Schedule, day: Date): string {
+  //   const startDate = new Date(schedule.startDate);
+  //   const endDate = new Date(schedule.endDate);
+  //   const dayOfWeek = day.getDay();
+  //   const daysUntilWeekEnd = 6 - dayOfWeek;
+  //   const weekIndex = Math.floor(this.daysDisplayedWithinMonth().findIndex(d => d === day) / 7);
 
-    // 同じ週内で終わる場合
-  if (endDate <= addDays(day, daysUntilWeekEnd)) {
-    const daysSpan = differenceInDays(endDate, startDate) + 1;
-    // return {
-    //   width: `calc(${Math.min(daysSpan, daysUntilWeekEnd + 1) * 100}% + ${Math.min(daysSpan, daysUntilWeekEnd + 1) - 1}rem)`,
-    //   top: '2em',
-    //   left: '0',
-    //   weekIndex
-    // };
-    // return `absolute block w-[calc(${Math.min(daysSpan, daysUntilWeekEnd + 1) * 100}%_+_${Math.min(daysSpan, daysUntilWeekEnd + 1)}rem)] top-[2em] min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]`
-    // return `absolute block w-[${w2}%] top-[2em] min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]`
-    return `absolute block top-[2em] min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]`
-  }
+  //   // 同じ週内で終わる場合
+  // if (endDate <= addDays(day, daysUntilWeekEnd)) {
+  //   const daysSpan = differenceInDays(endDate, startDate) + 1;
+  //   // return {
+  //   //   width: `calc(${Math.min(daysSpan, daysUntilWeekEnd + 1) * 100}% + ${Math.min(daysSpan, daysUntilWeekEnd + 1) - 1}rem)`,
+  //   //   top: '2em',
+  //   //   left: '0',
+  //   //   weekIndex
+  //   // };
+  //   // return `absolute block w-[calc(${Math.min(daysSpan, daysUntilWeekEnd + 1) * 100}%_+_${Math.min(daysSpan, daysUntilWeekEnd + 1)}rem)] top-[2em] min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]`
+  //   // return `absolute block w-[${w2}%] top-[2em] min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]`
+  //   return `absolute block top-[2em] min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]`
+  // }
   
-  // 週を跨ぐ場合、現在の週の残りの日数分だけ表示
-  // return {
-  //   width: `calc(${(daysUntilWeekEnd + 1) * 100}% + ${daysUntilWeekEnd}rem)`,
-  //   top: '2em',
-  //   left: '0',
-  //   weekIndex
-  // };
-  return `absolute block w-[calc(${(daysUntilWeekEnd + 1) * 100}%_+_${daysUntilWeekEnd}rem)] top-[2em] min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]`
+  // // 週を跨ぐ場合、現在の週の残りの日数分だけ表示
+  // // return {
+  // //   width: `calc(${(daysUntilWeekEnd + 1) * 100}% + ${daysUntilWeekEnd}rem)`,
+  // //   top: '2em',
+  // //   left: '0',
+  // //   weekIndex
+  // // };
+  // return `absolute block w-[calc(${(daysUntilWeekEnd + 1) * 100}%_+_${daysUntilWeekEnd}rem)] top-[2em] min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]`
   
-    // return `absolute block w-[calc(300%_+_1rem)] top-[2em] min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]`
-  }
+  //   // return `absolute block w-[calc(300%_+_1rem)] top-[2em] min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]`
+  // }
 
   // getVisibleSchedules(day: Date): Schedule[] {
   //   const schedules = (this.schedules() || []).filter(schedule => {
@@ -146,19 +145,19 @@ export class MonthCalendarComponent implements AfterViewInit {
   //   const positions = this.getPositionsForDay(date);
   //   return positions.slice(0, this.maxVisibleSchedules());
   // }
-  getVisibleSchedules(date: Date): MonthlyCalendarSchedulePosition2[] {
+
+  getVisibleSchedules(date: Date): MonthlyCalendarSchedulePosition[] {
     const weekStart = startOfWeek(date, { weekStartsOn: 0 });
-    const positions = calculateSchedulePositionsForMonthlyCalender(this.schedules() || [], weekStart);
-    // return positions
-    //   .filter(pos => pos.startOffset <= date.getDay() && 
-    //                  pos.startOffset + pos.duration > date.getDay())
-    //   .slice(0, this.maxVisibleSchedules());
-    return positions
+    const positions = calculateSchedulePositionsForMonthlyCalender(this.schedules() || [], weekStart, this.maxVisibleSchedules());
+    const visibleSchedules = positions
       .filter(pos => {
-        // const scheduleStart = startOfDay(new Date(pos.schedule.startDate));
-        // return isSameDay(scheduleStart, date);
         const scheduleStart = startOfDay(new Date(pos.schedule.startDate));
         const scheduleEnd = startOfDay(new Date(pos.schedule.endDate));
+
+        if (pos.row >= this.maxVisibleSchedules()) {
+          return false;
+        }
+
         // 1. その日が開始日の場合は表示
         if (isSameDay(scheduleStart, date)) {
           return true;
@@ -169,35 +168,65 @@ export class MonthCalendarComponent implements AfterViewInit {
         }
         return false;
       })
-      .slice(0, this.maxVisibleSchedules());
+      // .slice(0, this.maxVisibleSchedules());
+
+      return visibleSchedules
   }
-  getScheduleStyle(position: MonthlyCalendarSchedulePosition2): { [key: string]: string } {
-    console.log('position.row', position.row)
+  getScheduleStyle(position: MonthlyCalendarSchedulePosition): { [key: string]: string } {
+    console.log('position.duration:', position.duration)
+    const paddingOffset = (position.duration - 1) * 2 * 0.25;
+    const borderOffset = (position.duration - 1) * 2 * 1;
+
     return {
       position: 'absolute',
       left: '0',
-      width: `calc(${position.duration * 100}% + ${position.duration - 1}rem)`,
+      // width: `calc(${position.duration * 100}% + ${position.duration - 1}rem)`,
+      width: `calc(${position.duration * 100}% + ${paddingOffset}rem + ${borderOffset}px)`,
       // top: `${(position.row * 2 + 1.75)}rem`,
-      top: `${(position.row * 1.75)}rem`,
+      // top: `${(position.row * 1.75)}rem`,
+      top: `${(position.row * 2)}rem`,
       // transform: `translateX(calc(${position.startOffset * 100}% + ${position.startOffset}rem))`
     };
   }
   //
-
-  hasHiddenSchedules(date: Date): boolean {
-    return this.getPositionsForDay(date).length > this.maxVisibleSchedules();
-  }
-
   getHiddenSchedulesCount(date: Date): number {
-    return this.getPositionsForDay(date).length - this.maxVisibleSchedules();
+    const targetDate = startOfDay(date);
+    return (this.schedules() || [])
+      .filter(schedule => {
+        const scheduleStart = startOfDay(new Date(schedule.startDate));
+        const scheduleEnd = startOfDay(new Date(schedule.endDate));
+        
+        // その日が開始日と終了日の間に含まれているかチェック
+        return isWithinInterval(targetDate, { start: scheduleStart, end: scheduleEnd });
+      })
+      .length - this.maxVisibleSchedules();
   }
 
-  getPositionsForDay(date: Date): MonthlyCalendarSchedulePosition[] {
-    return calculateSchedulePositions(
-      this.schedules() || [],
-      date,
-    );
-  }
+  // hasHiddenSchedules(date: Date): boolean {
+  //   return this.getPositionsForDay(date).length > this.maxVisibleSchedules();
+  // }
+
+  // getHiddenSchedulesCount(date: Date): number {
+  //   return this.getPositionsForDay(date).length - this.maxVisibleSchedules();
+  // }
+
+  // private getPositionsForDay(date: Date): MonthlyCalendarSchedulePosition[] {
+  //   const weekStart = startOfWeek(date, { weekStartsOn: 0 });
+  //   const positions = this.getSchedulePositionsForWeek(weekStart);
+    
+  //   return positions.filter(pos => {
+  //     const dayOffset = differenceInDays(date, weekStart);
+  //     return dayOffset >= pos.startOffset && 
+  //            dayOffset < (pos.startOffset + pos.duration);
+  //   });
+  // }
+
+  // getPositionsForDay(date: Date): MonthlyCalendarSchedulePosition[] {
+  //   return calculateSchedulePositions(
+  //     this.schedules() || [],
+  //     date,
+  //   );
+  // }
 
   /////////////////////////////////////////////////////////////////////////////////////////////
   // getWeeks(): Date[] {
@@ -210,8 +239,7 @@ export class MonthCalendarComponent implements AfterViewInit {
   // }
 
   // getSchedulePositionsForWeek(weekStart: Date): MonthlyCalendarSchedulePosition[] {
-  //   // console.log('this.schedules():::', this.schedules()); 
-  //   return calculateSchedulePositions(this.schedules() || [], weekStart);
+  //   return calculateSchedulePositionsForMonthlyCalender(this.schedules() || [], weekStart);
   // }
 
   // getVisibleSchedulePositionsForWeek(weekStart: Date): MonthlyCalendarSchedulePosition[] {
