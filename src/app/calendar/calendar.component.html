@@ -16,6 +16,7 @@
       [schedules]="schedules()"
       (createSchedule)="openModal($event)"
       (editSchedule)="editSchedule($event)"
+      (updateSchedule)="updateSchedule($event)"
     />
     } @case ('Week') {
     <app-week-calendar

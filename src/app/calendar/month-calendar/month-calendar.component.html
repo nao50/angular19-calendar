@@ -11,25 +11,47 @@
 
   <div [class]="gridRowsClass" #calendarGrid>
     @for (day of daysDisplayedWithinMonth(); track day) {
+    <!-- <div
+      [class.bg-gray-50]="!isSameMonth(day, currentDate())"
+      [class.text-gray-400]="!isSameMonth(day, currentDate())"
+      [class.bg-blue-50]="isToday(day)"
+      class="border p-1 h-full grid grid-rows-[auto_1fr] cursor-pointer"
+      (click)="createSchedule.emit(day)"
+    > -->
     <div
       [class.bg-gray-50]="!isSameMonth(day, currentDate())"
       [class.text-gray-400]="!isSameMonth(day, currentDate())"
       [class.bg-blue-50]="isToday(day)"
       class="border p-1 h-full grid grid-rows-[auto_1fr] cursor-pointer"
       (click)="createSchedule.emit(day)"
+      (dragover)="onDragOver(day, $event)"
+      (drop)="onDrop(day, $event)"
     >
+      <!--  -->
       <div class="text-sm font-medium">{{ formatDate(day, "d") }}</div>
 
       <div class="relative min-h-0">
         <div class="absolute inset-0">
-          @for (schedule of getVisibleSchedules(day); track
+          <!--  -->
+          @let previewSchedule = getPreviewSchedulePosition(day); @if
+          (previewSchedule) {
+          <app-schedule
+            [schedule]="draggingSchedule()!"
+            [ngStyle]="getScheduleStyle(previewSchedule)"
+            class="block opacity-50"
+          />
+          } @for (schedule of getVisibleSchedules(day); track
           schedule.schedule.id) {
           <app-schedule
             [schedule]="schedule.schedule"
             [ngStyle]="getScheduleStyle(schedule)"
             (editSchedule)="editSchedule.emit(schedule.schedule)"
-            class="block min-h-[1.75rem] sm:min-h-[2rem] lg:min-h-[2.5rem]"
+            class="block"
             [class.opacity-75]="getHiddenSchedulesCount(day) > 0"
+            [class.opacity-50]="draggingSchedule() === schedule.schedule"
+            draggable="true"
+            (dragstart)="onDragStart(schedule.schedule, $event)"
+            (dragend)="onDragEnd()"
           />
           } @if (getHiddenSchedulesCount(day) > 0) {
           <div
@@ -43,40 +65,4 @@
     </div>
     }
   </div>
-
-  <!-- <div [class]="gridRowsClass" #calendarGrid>
-    @for (day of daysDisplayedWithinMonth(); track day) {
-    <div
-      [class.bg-gray-50]="!isSameMonth(day, currentDate())"
-      [class.text-gray-400]="!isSameMonth(day, currentDate())"
-      [class.bg-blue-50]="isToday(day)"
-      class="border p-1 h-full grid grid-rows-[auto_1fr] cursor-pointer relative"
-      (click)="createSchedule.emit(day)"
-    >
-      <div class="text-sm font-medium">{{ formatDate(day, "d") }}</div>
-
-      @if (hasHiddenSchedules(day)) {
-      <div
-        class="absolute bottom-0 left-0 right-0 text-xs text-gray-500 px-2 py-0.5 bg-white/80"
-      >
-        他 {{ getHiddenSchedulesCount(day) }} 件...
-      </div>
-      }
-    </div>
-    } @for (week of getWeeks(); track week) { @for (position of
-    getVisibleSchedulePositionsForWeek(week); track position.schedule.id) {
-    <div
-      class="absolute px-0.5 py-0.5"
-      [style.grid-row]="getScheduleGridRow(week, position)"
-      [style.grid-column]="getScheduleGridColumn(position)"
-      [style.top]="getScheduleTop(position)"
-    >
-      <app-schedule
-        [schedule]="position.schedule"
-        (editSchedule)="editSchedule.emit(position.schedule)"
-        class="block w-full"
-      />
-    </div>
-    } }
-  </div> -->
 </div>

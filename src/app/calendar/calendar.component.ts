@@ -101,6 +101,10 @@ export class CalendarComponent {
     this.editingSchedule = undefined;
   }
 
+  updateSchedule(schedule: Schedule) {
+    this.scheduleService.updateSchedule(schedule);
+  }
+
   saveSchedule(schedule: Omit<Schedule, 'id'>) {
     if (this.editingSchedule) {
       this.scheduleService.updateSchedule({
