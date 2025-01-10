@@ -1,8 +1,9 @@
-import { Component, inject, computed, output } from '@angular/core';
+import { Component, signal, inject, computed, output } from '@angular/core';
 import { CalendarHeaderComponent } from './calendar-header/calendar-header.component';
 import { MonthCalendarComponent } from './month-calendar/month-calendar.component';
 import { WeekCalendarComponent } from './week-calendar/week-calendar.component';
 import { EventModalComponent } from './event-modal/event-modal.component';
+import { ScheduleEditNotificationComponent } from './schedule-edit-notification/schedule-edit-notification.component';
 import { ScheduleService } from '../service/schedule.service';
 import { CalendarViewMode } from '../model/calendar.model';
 import { Schedule } from '../model/schedule.model';
@@ -17,7 +18,7 @@ import {
 
 @Component({
   selector: 'app-calendar',
-  imports: [CalendarHeaderComponent, MonthCalendarComponent, WeekCalendarComponent, EventModalComponent],
+  imports: [CalendarHeaderComponent, MonthCalendarComponent, WeekCalendarComponent, EventModalComponent, ScheduleEditNotificationComponent],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })
@@ -30,6 +31,8 @@ export class CalendarComponent {
   showModal = false;
   selectedDate: Date | null = null;
   editingSchedule: Schedule | undefined = undefined;
+  showNotification = signal(false);
+  saving = signal(false);
 
   ngOnInit() {
     this.generateDays();
@@ -92,6 +95,7 @@ export class CalendarComponent {
   openModal(date: Date) {
     this.selectedDate = date;
     this.editingSchedule = undefined;
+    this.showNotification.set(false);
     this.showModal = true;
   }
 
@@ -101,11 +105,31 @@ export class CalendarComponent {
     this.editingSchedule = undefined;
   }
 
-  updateSchedule(schedule: Schedule) {
-    this.scheduleService.updateSchedule(schedule);
+  closeNotification() {
+    this.showNotification.set(false);
   }
 
-  saveSchedule(schedule: Omit<Schedule, 'id'>) {
+  async updateSchedule(schedule: Schedule) {
+    this.saving.set(true);
+    this.showNotification.set(true);
+
+    // 実際のAPI呼び出しの代わりに1秒待機
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    this.scheduleService.updateSchedule(schedule);
+    this.saving.set(false);
+    setTimeout(() => {
+      this.showNotification.set(false);
+    }, 5000);
+
+  }
+
+  async saveSchedule(schedule: Omit<Schedule, 'id'>) {
+    this.saving.set(true);
+    this.showNotification.set(true);
+
+    // 実際のAPI呼び出しの代わりに1秒待機
+    // await new Promise(resolve => setTimeout(resolve, 1000));
+
     if (this.editingSchedule) {
       this.scheduleService.updateSchedule({
         ...this.editingSchedule,
@@ -115,6 +139,12 @@ export class CalendarComponent {
       this.scheduleService.addSchedule(schedule);
     }
     this.closeModal();
+
+    // 
+    this.saving.set(false);
+    setTimeout(() => {
+      this.showNotification.set(false);
+    }, 5000);
   }
 
   editSchedule(schedule: Schedule) {

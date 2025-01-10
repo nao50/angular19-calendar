@@ -36,3 +36,10 @@
     }
   </div>
 </div>
+
+@if (showNotification()) {
+<app-schedule-edit-notification
+  [saving]="saving()"
+  (close)="closeNotification()"
+/>
+}
