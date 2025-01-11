@@ -229,7 +229,7 @@ export class MonthCalendarComponent implements AfterViewInit {
       endDate: addDays(new Date(schedule.endDate), daysDiff),
     };
 
-    // 状態をリセット
+    // // 状態をリセット
     this.draggingSchedule.set(null);
     this.dropTargetDate.set(null);
     

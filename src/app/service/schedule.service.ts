@@ -7,8 +7,10 @@ import { isSameDay, isWithinInterval } from 'date-fns';
 })
 export class ScheduleService {
   schedules = signal<Schedule[]>([]);
+  // lastModifiedSchedule = signal<Schedule | null>(null);
+  lastModifiedSchedule = signal<{type: 'create' | 'update' | 'delete', schedule: Schedule} | null>(null);
 
-  addSchedule(schedule: Omit<Schedule, 'id'>): void {
+  createSchedule(schedule: Omit<Schedule, 'id'>): void {
     const newSchedule = {
       ...schedule,
       id: crypto.randomUUID().toString()
@@ -16,9 +18,31 @@ export class ScheduleService {
     this.schedules.update(v => {
       return [...v, newSchedule];
     });
+    this.lastModifiedSchedule.set({
+      type: 'create',
+      schedule: newSchedule
+    })
+  }
+
+  reCreateSchedule(schedule: Schedule): void {
+    this.schedules.update(v => {
+      return [...v, schedule];
+    });
+    this.lastModifiedSchedule.set({
+      type: 'create',
+      schedule: schedule
+    })
   }
 
   updateSchedule(schedule: Schedule): void {
+    const currentSchedule = this.schedules().find(s => s.id === schedule.id);
+    if (currentSchedule) {
+      this.lastModifiedSchedule.set({
+        type: 'update',
+        schedule: currentSchedule
+      })
+    }
+
     this.schedules.update(values => {
       return values.map(s => {
         return s.id === schedule.id ? schedule : s
@@ -26,9 +50,18 @@ export class ScheduleService {
     });
   }
 
-  deleteSchedule(id: string): void {
+  // deleteSchedule(id: string): void {
+  deleteSchedule(schedule: Schedule): void {
+    const currentSchedule = this.schedules().find(s => s.id === schedule.id);
+    if (currentSchedule) {
+      this.lastModifiedSchedule.set({
+        type: 'delete',
+        schedule: currentSchedule
+      })
+    }
+
     this.schedules.update(values => {
-      return values.filter(s =>  s.id !== id)
+      return values.filter(s =>  s.id !== schedule.id)
     });
   }
 

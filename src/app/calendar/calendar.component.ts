@@ -33,6 +33,7 @@ export class CalendarComponent {
   editingSchedule: Schedule | undefined = undefined;
   showNotification = signal(false);
   saving = signal(false);
+  isUndoNotification = signal(false);
 
   ngOnInit() {
     this.generateDays();
@@ -109,9 +110,41 @@ export class CalendarComponent {
     this.showNotification.set(false);
   }
 
+  async undoLastChange() {
+    this.saving.set(true);
+    this.isUndoNotification.set(true);
+    this.showNotification.set(true);
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    switch (this.scheduleService.lastModifiedSchedule()!.type) {
+      case 'create':
+        this.scheduleService.deleteSchedule(this.scheduleService.lastModifiedSchedule()!.schedule)
+        break;
+      case 'update':
+        this.scheduleService.updateSchedule(this.scheduleService.lastModifiedSchedule()!.schedule)
+        break;
+      case 'delete':
+        this.scheduleService.reCreateSchedule(this.scheduleService.lastModifiedSchedule()!.schedule)
+        break;
+    }
+
+    this.saving.set(false);
+    setTimeout(() => {
+      this.showNotification.set(false);
+    }, 5000);
+
+    this.scheduleService.lastModifiedSchedule.set(null)
+  }
+
+  canUndo(): boolean {
+    return this.scheduleService.lastModifiedSchedule() !== null;
+  }
+
   async updateSchedule(schedule: Schedule) {
     this.saving.set(true);
     this.showNotification.set(true);
+    this.isUndoNotification.set(false);
 
     // 実際のAPI呼び出しの代わりに1秒待機
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -120,12 +153,12 @@ export class CalendarComponent {
     setTimeout(() => {
       this.showNotification.set(false);
     }, 5000);
-
   }
 
-  async saveSchedule(schedule: Omit<Schedule, 'id'>) {
+  async createSchedule(schedule: Omit<Schedule, 'id'>) {
     this.saving.set(true);
     this.showNotification.set(true);
+    this.isUndoNotification.set(false);
 
     // 実際のAPI呼び出しの代わりに1秒待機
     // await new Promise(resolve => setTimeout(resolve, 1000));
@@ -136,7 +169,7 @@ export class CalendarComponent {
         ...schedule
       });
     } else if (this.selectedDate) {
-      this.scheduleService.addSchedule(schedule);
+      this.scheduleService.createSchedule(schedule);
     }
     this.closeModal();
 
@@ -154,7 +187,9 @@ export class CalendarComponent {
   }
 
   deleteSchedule(schedule: Schedule) {
-    this.scheduleService.deleteSchedule(schedule.id);
+    this.isUndoNotification.set(false);
+
+    this.scheduleService.deleteSchedule(schedule);
     this.closeModal();
   }
 

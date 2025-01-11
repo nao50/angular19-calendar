@@ -30,7 +30,7 @@
       [selectedDate]="selectedDate!"
       [editingSchedule]="editingSchedule"
       (closeModal)="closeModal()"
-      (saveSchedule)="saveSchedule($event)"
+      (createSchedule)="createSchedule($event)"
       (deleteSchedule)="deleteSchedule($event)"
     />
     }
@@ -41,5 +41,8 @@
 <app-schedule-edit-notification
   [saving]="saving()"
   (close)="closeNotification()"
+  [isUndo]="isUndoNotification()"
+  [canUndo]="canUndo()"
+  (undo)="undoLastChange()"
 />
 }

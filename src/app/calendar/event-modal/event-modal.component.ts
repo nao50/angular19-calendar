@@ -16,7 +16,7 @@ export class EventModalComponent implements AfterViewInit {
   selectedDate = input.required<Date>();
   editingSchedule = input<Schedule>();
   closeModal = output<void>();
-  saveSchedule = output<Omit<Schedule, 'id'>>();
+  createSchedule = output<Omit<Schedule, 'id'>>();
   deleteSchedule = output<Schedule>();
 
   title = '';
@@ -61,7 +61,7 @@ export class EventModalComponent implements AfterViewInit {
 
   onSubmit(event: Event) {
     event.preventDefault();
-    this.saveSchedule.emit({
+    this.createSchedule.emit({
       title: this.title,
       description: this.description,
       startDate: new Date(this.startDate),

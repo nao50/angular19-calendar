@@ -9,4 +9,7 @@ import { Component, input, output } from '@angular/core';
 export class ScheduleEditNotificationComponent {
   saving = input<boolean>();
   close = output<void>();
+  isUndo = input<boolean>();
+  canUndo = input<boolean>();
+  undo = output<void>();
 }
